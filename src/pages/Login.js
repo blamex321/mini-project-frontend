@@ -1,9 +1,14 @@
 import React, { useState, useEffect } from "react";
 import axios from "axios";
+import { login } from "../slices/loginSlice";
+import { useDispatch } from "react-redux";
+import { ToastContainer, toast } from "react-toastify";
+import "react-toastify/dist/ReactToastify.css";
 
 const Login = () => {
   const [username, setUsername] = useState("");
   const [password, setPassword] = useState("");
+  const dispatch = useDispatch();
 
   async function handleLoginClick() {
     try {
@@ -14,10 +19,23 @@ const Login = () => {
           u_pwd: password,
         }
       );
-      console.log(result.data);
       let jwtToken = result.data.token;
       localStorage.setItem("jwt", jwtToken);
-      window.location.href = "/products";
+      const userData = {
+        username: result.data.user.u_name,
+        email: result.data.user.u_u_email,
+        contact: result.data.user.u_u_contact,
+      };
+      console.log(userData);
+      dispatch(login(userData));
+      toast("Login Successful!", {
+        type: "success",
+        position: "top-right",
+        pauseOnHover: false,
+      });
+      setTimeout(() => {
+        window.location.href = "/products";
+      }, 5000); // 5000 ms = 5 seconds
     } catch (err) {
       console.log(err);
     }
@@ -110,6 +128,7 @@ const Login = () => {
           </p>
         </div>
       </div>
+      <ToastContainer />
     </div>
   );
 };
